@@ -1,9 +1,10 @@
 import textwrap
 from abc import ABC, abstractmethod
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT_PATH = Path(__file__).parent
+
 
 class ContasIterador:
     def __init__(self, contas):
@@ -16,15 +17,16 @@ class ContasIterador:
     def __next__(self):
         try:
             conta = self.contas[self._index]
-            self._index += 1
             return f"""\
-            Agência:\t{conta.agencia}
-            Número:\t\t{conta.numero}
-            Titular:\t{conta.cliente.nome}
-            Saldo:\t\tR$ {conta.saldo:.2f}
-            """
+                Agência:\t{conta.agencia}
+                Número:\t\t{conta.numero}
+                Titular:\t{conta.cliente.nome}
+                Saldo:\t\tR$ {conta.saldo:.2f}
+                """
         except IndexError:
             raise StopIteration
+        finally:
+            self._index += 1
 
 
 class Cliente:
@@ -108,7 +110,9 @@ class Conta:
             self._saldo += valor
             print("\n==== Depósito realizado com sucesso! ====")
         else:
-            print("\n:::: Falha na operação! Por favor, digite um valor a ser depositado. ::::")
+            print(
+                "\n:::: Falha na operação! Por favor, digite um valor a ser depositado. ::::"
+            )
             return False
 
         return True
@@ -137,10 +141,14 @@ class ContaCorrente(Conta):
         excedeu_saques = numero_saques >= self.limite_saques
 
         if excedeu_limite:
-            print("\n++++ Falha na operação! O valor do saque é maior que o limite disponível. ++++")
+            print(
+                "\n++++ Falha na operação! O valor do saque é maior que o limite disponível. ++++"
+            )
 
         elif excedeu_saques:
-            print("\n++++ Falha na operação! O número de saques diário foi excedido. ++++")
+            print(
+                "\n++++ Falha na operação! O número de saques diário foi excedido. ++++"
+            )
 
         else:
             return super().sacar(valor)
@@ -359,9 +367,7 @@ def cadastrar_cliente(clientes):
 
     nome = input("Informe o nome completo do cliente: ")
     data_nascimento = input("Informe a data de nascimento (dd-mm-aaaa): ")
-    endereco = input(
-        "Informe o endereço (logradouro, nro - bairro - cidade/UF): "
-    )
+    endereco = input("Informe o endereço (logradouro, nro - bairro - cidade/UF): ")
 
     cliente = PessoaFisica(
         nome=nome, data_nascimento=data_nascimento, cpf=cpf, endereco=endereco
@@ -378,7 +384,9 @@ def abrir_conta(numero_conta, clientes, contas):
     cliente = filtrar_cliente(cpf, clientes)
 
     if not cliente:
-        print("\n:::: Cliente não encontrado. Processo de abertura de conta encerrado! ::::")
+        print(
+            "\n:::: Cliente não encontrado. Processo de abertura de conta encerrado! ::::"
+        )
         return
 
     conta = ContaCorrente.nova_conta(
@@ -430,5 +438,7 @@ def main():
                 "\n:::: Operação Inválida. Por favor, selecione novamente a opção desejada. ::::"
             )
 
+
 if __name__ == "__main__":
+
     main()
